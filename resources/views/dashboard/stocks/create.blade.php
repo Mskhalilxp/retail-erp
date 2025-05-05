@@ -1,0 +1,243 @@
+@extends('partials.master')
+@section('content')
+
+    <!-- begin :: Subheader -->
+    <div class="toolbar">
+
+        <div class="container-fluid d-flex flex-stack">
+
+            <div data-kt-swapper="true" data-kt-swapper-mode="prepend"
+                 data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}"
+                 class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
+
+                <!-- begin :: Title -->
+                <h1 class="d-flex align-items-center text-dark fw-bolder fs-3 my-1"><a href="{{ route('dashboard.stocks.index') }}" class="text-muted text-hover-primary">{{ __("Stocks") }}</a></h1>
+                <!-- end :: Title -->
+
+                <!-- begin :: Separator -->
+                <span class="h-20px border-gray-300 border-start mx-4"></span>
+                <!-- end :: Separator -->
+
+                <!-- begin :: Breadcrumb -->
+                <ul class="breadcrumb breadcrumb-separatorless fw-bold fs-7 my-1">
+                    <!-- begin :: Product -->
+                    <li class="breadcrumb-product text-muted">
+                        {{ __("Add new stock") }}
+                    </li>
+                    <!-- end :: Product -->
+                </ul>
+                <!-- end :: Breadcrumb -->
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- end :: Subheader -->
+
+    <div class="card">
+        <!-- begin :: Card body -->
+        <div class="card-body p-0">
+            <!-- begin :: Form -->
+            <form action="{{ route('dashboard.stocks.store') }}" class="form submitted-form" method="post"  data-redirection-url="{{ route('dashboard.stocks.index') }}">
+            @csrf
+                <!-- begin :: Card header -->
+                <div class="card-header d-flex align-items-center">
+                    <h3 class="fw-bolder text-dark">{{ __("Add new stock") }}</h3>
+                </div>
+                <!-- end :: Card header -->
+
+                <!-- begin :: Inputs wrapper -->
+                <div class="inputs-wrapper">
+                    <!-- begin :: Row -->
+                    <div class="row mb-8">
+                        <!-- begin :: Column -->
+                        <div class="col-md-3 fv-row">
+                            <label class="required fs-5 fw-bold mb-2">{{ __("Price") }}</label>
+                            <div class="form-floating">
+                                <input required type="number" min="1" class="form-control" id="price_inp" name="price" placeholder="example"/>
+                                <label for="price_inp">{{ __("Enter the price") }}</label>
+                            </div>
+                            <p class="invalid-feedback" id="price" ></p>
+                        </div>
+                        <!-- end :: Column -->
+
+                        <!-- begin :: Column -->
+                        <div class="col-md-3 fv-row">
+                            <label class="required fs-5 fw-bold mb-2">{{ __("Delivery price") }}</label>
+                            <div class="form-floating">
+                                <input required type="number" min="1" class="form-control" id="delivery_price_inp" name="delivery_price" placeholder="example"/>
+                                <label for="delivery_price_inp">{{ __("Enter delivery price") }}</label>
+                            </div>
+                            <p class="invalid-feedback" id="delivery_price" ></p>
+                        </div>
+                        <!-- end :: Column -->
+
+                        <!-- begin :: Column -->
+                        <div class="col-md-3 fv-row">
+                            <label class="required fs-5 fw-bold mb-2">{{ __("Delivery date") }}</label>
+                            <div class="form-floating">
+                                <input type="text" class="form-control datepicker filter-datatable-inp" data-filter-index="3" id="delivery_date_inp" name="delivery_date" placeholder="example"/>
+                                <label for="delivery_date_inp">{{ __("Pick delivery date") }}</label>
+                            </div>
+                            <p class="invalid-feedback" id="delivery_date" ></p>
+                        </div>
+                        <!-- end :: Column -->
+
+                        <!-- begin :: Column -->
+                        <div class="col-md-3 fv-row">
+                            <label class="required fs-5 fw-bold mb-2">{{ __("Status") }}</label>
+                            <select required class="form-select" data-control="select2" name="status" id="status_inp" data-placeholder="{{ __("Select status") }}" data-dir="{{ isArabic() ? 'rtl' : 'ltr' }}" >
+                                <option value=""></option>
+                                @foreach (App\Enums\StockStatus::values() as $key => $value)
+                                    <option value="{{ $value }}">{{ __(ucfirst(str_replace('_', ' ', $key))) }}</option>
+                                @endforeach
+                            </select>
+                            <p class="invalid-feedback" id="status" ></p>
+                        </div>
+                        <!-- end :: Column -->
+                    </div>
+                    <!-- end :: Row -->
+
+                    <hr>
+                    <h1 class="w-75">{{ __('Products') }}</h1>
+
+                    <div class="row justify-content-center mb-8 mt-5">
+                        <button class="btn bg-primary w-auto text-white" type="button" onclick="addProduct('product')">
+                            <i class="fas fa-plus text-white" aria-hidden="true"></i> {{ __('Add new product') }}
+                        </button>
+                    </div>
+
+                    <p class="invalid-feedback text-center" id="products" ></p>
+
+                    <div class="row mb-8 justify-content-center" id="products-container">
+                        <div class="border-secondary border rounded w-75 px-4" id="product-1">
+                            <!-- begin :: Row -->
+                            <div class="row my-5 align-items-center">
+                                <!-- begin :: Column -->
+                                <div class="col-md-6 fv-row">
+                                    <label class="required fs-5 fw-bold mb-2">{{ __("Product") }}</label>
+                                    <select required class="form-select" data-control="select2" name="products[0][id]" id="products_0_id_inp" data-placeholder="{{ __("Select product") }}" data-dir="{{ isArabic() ? 'rtl' : 'ltr' }}" >
+                                        <option value=""></option>
+                                        @foreach (App\Models\Product::get() as $product)
+                                            <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <p class="invalid-feedback" id="products_0_id" ></p>
+                                </div>
+                                <!-- end :: Column -->
+
+                                <!-- begin :: Column -->
+                                <div class="col-md-5 fv-row">
+                                    <label class="required fs-5 fw-bold mb-2">{{ __("Quantity") }}</label>
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control quantity-inp" id="products_0_quantity_inp" data-index="0" name="products[0][quantity]" placeholder="example"/>
+                                        <label for="products_0_quantity_inp">{{ __("Enter the quantity") }}</label>
+                                    </div>
+                                    <p class="invalid-feedback" id="products_0_quantity" ></p>
+                                </div>
+                                <!-- end :: Column -->
+
+                                <!-- begin :: Column -->
+                                <div class="col-md-1 fv-row text-center">
+                                    <button class="btn px-2" type="button" onclick="deleteProduct(1)">
+                                        <i class="fas fa-trash text-danger fs-2"></i>
+                                    </button>
+                                </div>
+                                <!-- end :: Column -->
+                            </div>
+                            <!-- end :: Row -->
+                        </div>
+                    </div>
+                </div>
+                <!-- end :: Inputs wrapper -->
+
+                <!-- begin :: Form footer -->
+                <div class="form-footer">
+
+                    <!-- begin :: Submit btn -->
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+
+                        <span class="indicator-label">{{ __("Save") }}</span>
+
+                        <!-- begin :: Indicator -->
+                        <span class="indicator-progress">{{ __("Please wait ...") }}
+                            <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                        <!-- end :: Indicator -->
+
+                    </button>
+                    <!-- end :: Submit btn -->
+
+                </div>
+                <!-- end :: Form footer -->
+            </form>
+            <!-- end :: Form -->
+        </div>
+        <!-- end :: Card body -->
+    </div>
+
+@endsection
+@push('scripts')
+    <script>
+        $(document).ready(function () {
+            initDatePicker();
+        });
+
+        let addProduct = () => {
+            let productsContainer = $(`#products-container`);
+            let index = productsContainer.children().length;
+            productHtml = `
+                    <div class="border-secondary border rounded w-75 px-4 ${index != 0 ? 'mt-5' : ''}" id="product-${index + 1}">
+                        <!-- begin :: Row -->
+                            <div class="row my-5 align-items-center">
+                                <!-- begin :: Column -->
+                                <div class="col-md-6 fv-row">
+                                    <label class="required fs-5 fw-bold mb-2">{{ __("Product") }}</label>
+                                    <select required class="form-select" data-control="select2" name="products[${index}][id]" id="products_${index}_id_inp" data-placeholder="{{ __("Select product") }}" data-dir="{{ isArabic() ? 'rtl' : 'ltr' }}" >
+                                        <option value=""></option>
+                                        @foreach (App\Models\Product::get() as $product)
+                                            <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <p class="invalid-feedback" id="products_${index}_id" ></p>
+                                </div>
+                                <!-- end :: Column -->
+
+                                <!-- begin :: Column -->
+                                <div class="col-md-5 fv-row">
+                                    <label class="required fs-5 fw-bold mb-2">{{ __("Quantity") }}</label>
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control quantity-inp" id="products_${index}_quantity_inp" data-index="${index}" name="products[${index}][quantity]" placeholder="example"/>
+                                        <label for="products_${index}_quantity_inp">{{ __("Enter the quantity") }}</label>
+                                    </div>
+                                    <p class="invalid-feedback" id="products_${index}_quantity" ></p>
+                                </div>
+                                <!-- end :: Column -->
+
+                                <!-- begin :: Column -->
+                                <div class="col-md-1 fv-row text-center">
+                                    <button class="btn px-2" type="button" onclick="deleteProduct(${index + 1})">
+                                        <i class="fas fa-trash text-danger fs-2"></i>
+                                    </button>
+                                </div>
+                                <!-- end :: Column -->
+                            </div>
+                        <!-- end :: Row -->
+                    </div>`;
+
+            productsContainer.append(productHtml).hide().fadeIn(300);
+            $(`#products_${index}_id_inp`).val(null)
+            $(`#products_${index}_id_inp`).select2().trigger('change');
+
+            // $(`#product-${index}`).find('.fas.fa-trash.text-danger').hide();
+        }
+
+        let deleteProduct = (id) => {
+            $(`#product-${id}`).fadeOut(300, function () {
+                $(this).remove();
+            })
+            // $(`#product-${id}`).prev().find('.fas.fa-trash.text-danger').show();
+        }
+    </script>
+@endpush
