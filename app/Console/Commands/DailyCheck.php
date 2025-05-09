@@ -48,7 +48,7 @@ class DailyCheck extends Command
         }
         else
         {
-            $ordersIds = Order::where('status', OrderStatus::prepared->value)->get()->pluck('id')->chunk(25)->toArray();
+            $ordersIds = Order::where('status', OrderStatus::prepared->value)->get()->pluck('qr_id')->chunk(25)->toArray();
             for($i = 0; $i < count($ordersIds); $i++)
             {
                 $ordersIds[$i] = implode(',', $ordersIds[$i]);
